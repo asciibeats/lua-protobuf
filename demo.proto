@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package demo;
+
+message Base {
+	map<int32,int32> items = 1;
+	Nested nested = 2;
+	bool istrue = 3;
+}
+
+message Nested {
+	string text = 1;
+	repeated int32 some = 2;
+}
