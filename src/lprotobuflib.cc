@@ -2,13 +2,6 @@
 #include "google/protobuf/reflection.h" 
 #include "google/protobuf/map.h" 
 #include "google/protobuf/descriptor.pb.h" 
-//#include <ei.h>
-#include <climits>
-#include <cstdlib>
-#include <cmath>
-#include <cstring>
-#include <string>
-//#include <map>
 #include <lua.hpp>
 
 #define KEY(field) (field->message_type()->field(0))
@@ -285,7 +278,6 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 				{
 					int size = reflection->FieldSize(message, field);
 					lua_createtable(L, 0, size);
-					//luap_settype(L, -1, LUAP_TABLE_LIST);
 
 					for (int index = 0; index < size; index++)
 					{
@@ -304,7 +296,6 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 				{
 					int size = reflection->FieldSize(message, field);
 					lua_createtable(L, 0, size);
-					//luap_settype(L, -1, LUAP_TABLE_LIST);
 
 					for (int index = 0; index < size; index++)
 					{
@@ -323,7 +314,6 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 				{
 					int size = reflection->FieldSize(message, field);
 					lua_createtable(L, 0, size);
-					//luap_settype(L, -1, LUAP_TABLE_LIST);
 
 					for (int index = 0; index < size; index++)
 					{
@@ -342,7 +332,6 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 				{
 					int size = reflection->FieldSize(message, field);
 					lua_createtable(L, 0, size);
-					//luap_settype(L, -1, LUAP_TABLE_LIST);
 
 					for (int index = 0; index < size; index++)
 					{
@@ -361,7 +350,6 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 				{
 					int size = reflection->FieldSize(message, field);
 					lua_createtable(L, 0, size);
-					//luap_settype(L, -1, LUAP_TABLE_LIST);
 
 					for (int index = 0; index < size; index++)
 					{
@@ -404,7 +392,7 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 								break;
 
 							default:
-								luaL_error(L, "pushing unsupported KEY(%i)", KEY(field)->type());
+								luaL_error(L, "unsupported KEY(%i)", KEY(field)->type());
 						}
 
 						switch (VALUE(field)->type())
@@ -434,7 +422,7 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 								break;
 
 							default:
-								luaL_error(L, "pushing unsupported VALUE(%i)", VALUE(field)->type());
+								luaL_error(L, "unsupported VALUE(%i)", VALUE(field)->type());
 						}
 
 						lua_rawset(L, -3);
@@ -444,7 +432,6 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 				{
 					int size = reflection->FieldSize(message, field);
 					lua_createtable(L, 0, size);
-					//luap_settype(L, -1, LUAP_TABLE_LIST);
 
 					for (int index = 0; index < size; index++)
 					{
@@ -464,7 +451,7 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 				break;
 
 			default:
-				luaL_error(L, "pushing unsupported field %i", field->type());
+				luaL_error(L, "unsupported field %i", field->type());
 		}
 
 		lua_rawset(L, -3);
@@ -485,7 +472,6 @@ static int protobuf_decode(lua_State *L)
 {
 	const char* name = luaL_checkstring(L, 1);
 	const Descriptor* descriptor = DescriptorPool::generated_pool()->FindMessageTypeByName(name);
-	//assert(descriptor != NULL);
 	Message* message = MessageFactory::generated_factory()->GetPrototype(descriptor)->New();
 	protobuf_parse(L, 2, message);
 	protobuf_pushmessage(L, *message);
@@ -500,82 +486,6 @@ static const struct luaL_Reg protobuf_f [] = {
 
 int luaopen_protobuf(lua_State *L)
 {
-	//luaL_newmetatable(L, PROTO_LUAT);
-	//lua_pushvalue(L, -1);
   luaL_newlib(L, protobuf_f);
 	return 1;
 }
-
-/*int ei_decode_proto(const char* buf, int* index, Message* message)
-{
-	int type;
-	long size = 0;
-
-	ei_get_type(buf, index, &type, (int*)&size);
-	char* data = new char[size];//dont create everytime
-
-	if (ei_decode_binary(buf, index, data, &size))
-	{
-		delete [] data;
-		return 1;
-	}
-
-	if (!message->ParseFromArray(data, size))
-	{
-		delete [] data;
-		return 2;
-	}
-
-	delete [] data;
-	return 0;
-}
-
-int e2l_decode_proto(const char *buf, int *index, lua_State *L, const char* name)
-{
-	const Descriptor* descriptor = DescriptorPool::generated_pool()->FindMessageTypeByName(name);
-
-	if (descriptor == NULL)
-	{
-		return 1;
-	}
-
-	Message* message = MessageFactory::generated_factory()->GetPrototype(descriptor)->New();
-
-	if (ei_decode_proto(buf, index, message))
-	{
-		return 1;
-	}
-
-	protobuf_pushmessage(L, *message);
-	return 0;
-}*/
-
-/*int ei_x_encode_proto(ei_x_buff* x, Message* message)
-{
-	size_t size = message->ByteSizeLong();
-
-	if ((unsigned int)x->index + size > (unsigned int)x->buffsz)
-	{
-		x->buffsz <<= 1;
-		xrealloc(x->buff, x->buffsz);
-	}
-
-	if (!message->SerializeToArray(x->buff, size))
-	{
-		return 1;
-	}
-
-	return 0;
-}
-
-int l2e_encode_proto_host(lua_State *L, int index, ei_x_buff *eb)
-{
-	protobuf_serialize(L, &host);
-	
-	if (ei_x_encode_proto(eb, &host))
-	{
-		return 1;
-	}
-
-	return 0;
-}*/

@@ -1,18 +1,18 @@
 local function dump(t, i)
-  if not i then
+	if not i then
 		i = 0
 	end
-  for k, v in pairs(t) do
-    local f = string.rep('  ', i) .. k .. ': '
-    if type(v) == 'table' then
-      print(f)
-      dump(v, i + 1)
-    elseif type(v) == 'boolean' then
-      print(f .. tostring(v))
-    else
-      print(f .. v)
-    end
-  end
+	for k, v in pairs(t) do
+		local f = string.rep('  ', i) .. k .. ': '
+		if type(v) == 'table' then
+			print(f)
+			dump(v, i + 1)
+		elseif type(v) == 'boolean' then
+			print(f .. tostring(v))
+		else
+			print(f .. v)
+		end
+	end
 end
 
 local protobuf = require('protobuf')
