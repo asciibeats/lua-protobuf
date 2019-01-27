@@ -16,7 +16,7 @@ message Nested {
 ```
 ```lua
 local protobuf = require('protobuf')
-local input = {items = {[1] = 2}, nested = {text = 'hello!', some = {1, 2, 3}}, istrue = false}
+local input = {items = {[2] = 4}, nested = {text = 'hello!', some = {1, 2, 3}}, istrue = false}
 local binary = protobuf.encode('demo.Base', input)
 local output = protobuf.decode('demo.Base', binary)
 ```
