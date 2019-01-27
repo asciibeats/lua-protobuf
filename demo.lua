@@ -16,7 +16,7 @@ local function dump(t, i)
 end
 
 local protobuf = require('protobuf')
-local input = {items = {[1] = 2}, nested = {text = 'text', some = {1, 2, 3}}, istrue = true}
+local input = {items = {[2] = 4}, nested = {text = 'text', some = {1, 2, 3}}, istrue = true}
 local binary = protobuf.encode('demo.Base', input)
 local output = protobuf.decode('demo.Base', binary)
 
