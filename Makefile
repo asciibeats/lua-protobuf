@@ -10,11 +10,12 @@ ifeq ($(LUA_VERSION),)
 endif
 LUA_LIBDIR := /usr/lib/lua/$(LUA_VERSION)
 
-PROTOS=$(wildcard *.proto)
-PBSOURCES=$(patsubst %.proto, src/%.pb.cc, $(PROTOS))
-SOURCES=$(filter-out $(wildcard src/*.pb.cc), $(wildcard src/*.cc))
-OBJECTS=$(patsubst %.cc, %.o, $(SOURCES) $(PBSOURCES))
-OUTFILE=protobuf.so
+LUA_PROTO_PATH ?= .
+PROTOS := $(wildcard $(LUA_PROTO_PATH)/*.proto)
+PBSOURCES := $(patsubst %.proto, src/%.pb.cc, $(PROTOS))
+SOURCES := $(filter-out $(wildcard src/*.pb.cc), $(wildcard src/*.cc))
+OBJECTS := $(patsubst %.cc, %.o, $(SOURCES) $(PBSOURCES))
+OUTFILE := protobuf.so
 
 $(OUTFILE): $(OBJECTS)
 	g++ -shared -o $(OUTFILE) $(OBJECTS) $(LDLIBS)
