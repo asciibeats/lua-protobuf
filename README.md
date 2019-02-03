@@ -1,5 +1,8 @@
 # lua-protobuf
 *A lua module to encode and decode [protocol buffer](https://developers.google.com/protocol-buffers/) messages*
+
+It is meant to be a special-purpose module and to be compiled into a separate module for each project and set of protocol buffer definitions.
+
 ```protobuf
 package demo;
 
