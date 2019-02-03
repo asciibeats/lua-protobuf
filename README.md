@@ -1,5 +1,5 @@
 # lua-protobuf
-*A lua module to encode and decode protocol buffer messages*
+*A lua module to encode and decode [protocol buffer](https://developers.google.com/protocol-buffers/) messages*
 ```protobuf
 package demo;
 
@@ -28,7 +28,7 @@ git clone https://github.com/asciibeats/lua-protobuf.git
 cd lua-protobuf
 make
 ```
-To use your own proto definitions set the LUA\_PPATH variable.
+To use your own proto definitions, set the LUA\_PPATH variable.
 ```
 LUA_PPATH=path/to/protos make
 ```
@@ -40,7 +40,7 @@ make install
 ```
 
 ## Demo
-You need to have compiled lua-protobuf with the included demo.proto.
+You need to have made lua-protobuf with the included demo.proto.
 ```
 lua -v demo.lua
 ```
