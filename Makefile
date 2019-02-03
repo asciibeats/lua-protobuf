@@ -10,9 +10,9 @@ ifeq ($(LUA_VERSION),)
 endif
 LUA_LIBDIR := /usr/lib/lua/$(LUA_VERSION)
 
-LUA_PROTO_PATH ?= .
-PROTOS := $(wildcard $(LUA_PROTO_PATH)/*.proto)
-PBSOURCES := $(patsubst %.proto, src/%.pb.cc, $(PROTOS))
+LUA_PPATH ?= .
+PROTOS := $(wildcard $(LUA_PPATH)/*.proto)
+PBSOURCES := $(patsubst $(LUA_PPATH)/%.proto, src/%.pb.cc, $(PROTOS))
 SOURCES := $(filter-out $(wildcard src/*.pb.cc), $(wildcard src/*.cc))
 OBJECTS := $(patsubst %.cc, %.o, $(SOURCES) $(PBSOURCES))
 OUTFILE := protobuf.so
@@ -23,8 +23,8 @@ $(OUTFILE): $(OBJECTS)
 $(OBJECTS): src/%.o: src/%.cc | $(PBSOURCES)
 	g++ $(CFLAGS) -c $< -o $@
 
-$(PBSOURCES): src/%.pb.cc: %.proto
-	protoc --cpp_out=src --proto_path=. $<
+$(PBSOURCES): src/%.pb.cc: $(LUA_PPATH)/%.proto
+	protoc --cpp_out=src --proto_path=$(LUA_PPATH) $<
 
 install:
 	mkdir -p $(LUA_LIBDIR)

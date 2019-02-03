@@ -22,10 +22,15 @@ local output = protobuf.decode('demo.Base', binary)
 ```
 
 ## Build
+You need to have [protoc](https://github.com/protocolbuffers/protobuf/releases) installed.
 ```
 git clone https://github.com/asciibeats/lua-protobuf.git
 cd lua-protobuf
 make
+```
+To use your own proto definitions set the LUA\_PPATH variable.
+```
+LUA_PPATH=path/to/protos make
 ```
 
 ## Install
@@ -35,6 +40,7 @@ make install
 ```
 
 ## Demo
+You need to have compiled lua-protobuf with the included demo.proto.
 ```
 lua -v demo.lua
 ```
