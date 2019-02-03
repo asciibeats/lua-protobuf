@@ -33,12 +33,6 @@ To use your own proto definitions, set the LUA\_PPATH variable.
 LUA_PPATH=path/to/protos make
 ```
 
-## Install
-You need to be root. Installs to /usr/lib/lua/<lua_version>.
-```
-make install
-```
-
 ## Demo
 You need to have made lua-protobuf without providing a LUA_PPATH.
 ```
