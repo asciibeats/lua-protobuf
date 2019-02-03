@@ -462,6 +462,7 @@ static int protobuf_encode(lua_State *L)
 {
 	const char* name = luaL_checkstring(L, 1);
 	const Descriptor* descriptor = DescriptorPool::generated_pool()->FindMessageTypeByName(name);
+  luaL_argcheck(L, descriptor != NULL, 1, "message not found");
 	Message* message = MessageFactory::generated_factory()->GetPrototype(descriptor)->New();
 	protobuf_tomessage(L, 2, message);
 	protobuf_serialize(L, message);
@@ -472,6 +473,7 @@ static int protobuf_decode(lua_State *L)
 {
 	const char* name = luaL_checkstring(L, 1);
 	const Descriptor* descriptor = DescriptorPool::generated_pool()->FindMessageTypeByName(name);
+  luaL_argcheck(L, descriptor != NULL, 1, "message not found");
 	Message* message = MessageFactory::generated_factory()->GetPrototype(descriptor)->New();
 	protobuf_parse(L, 2, message);
 	protobuf_pushmessage(L, *message);
