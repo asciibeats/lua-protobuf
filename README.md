@@ -40,7 +40,7 @@ make install
 ```
 
 ## Demo
-You need to have made lua-protobuf with the included demo.proto.
+You need to have made lua-protobuf without providing a LUA_PPATH.
 ```
 lua -v demo.lua
 ```
