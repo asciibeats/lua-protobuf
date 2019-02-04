@@ -31,13 +31,18 @@ git clone https://github.com/asciibeats/lua-protobuf.git
 cd lua-protobuf
 make
 ```
-To use your own proto definitions, set the LUA\_PPATH variable.
+To use your own proto definitions, set the LUA\_PROTOBUF\_PATH variable.
 ```
-LUA_PPATH=path/to/protos make
+LUA_PROTOBUF_PATH=path/to/protos make
 ```
+To create a custom-named module, set the LUA\_PROTOBUF\_NAME variable.
+```
+LUA_PROTOBUF_NAME=myname make
+```
+That will result in a module called protobuf\_myname.so.
 
 ## Demo
-You need to have made lua-protobuf without providing a LUA_PPATH.
+You need to have made lua-protobuf without providing any LUA\_PROTOBUF\_\* variable.
 ```
 lua -v demo.lua
 ```

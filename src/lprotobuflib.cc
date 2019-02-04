@@ -486,7 +486,7 @@ static const struct luaL_Reg protobuf_f [] = {
 	{NULL, NULL}
 };
 
-int luaopen_protobuf(lua_State *L)
+LUAOPEN_PROTOBUF(LUA_PROTOBUF_NAME)
 {
   luaL_newlib(L, protobuf_f);
 	return 1;
