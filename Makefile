@@ -6,7 +6,7 @@ LDLIBS += -lprotobuf -lpthread
 
 LUA_VERSION	:= $(shell lua -e "_,_,v=string.find(_VERSION,'Lua (.+)');print(v)")
 ifeq ($(LUA_VERSION),)
-	LUA_VERSION := 5.3
+  LUA_VERSION := 5.3
 endif
 LUA_LIBDIR := /usr/lib/lua/$(LUA_VERSION)
 
