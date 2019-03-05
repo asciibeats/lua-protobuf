@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package test;
+
+message Value {
+  int32 val = 1;
+}
+
+message Test {
+  double dbl = 1;
+  repeated double rdbl = 2;
+  map<int32,double> mdbl = 3;
+  float flt = 4;
+  repeated float rflt = 5;
+  map<int32,float> mflt = 6;
+  int32 int = 7;
+  repeated int32 rint = 8;
+  map<int32,int32> mint = 9;
+  sint32 sint = 10;
+  repeated sint32 rsint = 11;
+  map<sint32,sint32> msint = 12;
+  sfixed32 sfint = 13;
+  repeated sfixed32 rsfint = 14;
+  map<sfixed32,sfixed32> msfint = 15;
+  int64 long = 16;
+  repeated int64 rlong = 17;
+  map<int64,int64> mlong = 18;
+  sint64 slong = 19;
+  repeated sint64 rslong = 20;
+  map<sint64,sint64> mslong = 21;
+  sfixed64 sflong = 22;
+  repeated sfixed64 rsflong = 23;
+  map<sfixed64,sfixed64> msflong = 24;
+  uint32 uint = 25;
+  repeated uint32 ruint = 26;
+  map<uint32,uint32> muint = 27;
+  fixed32 ufint = 28;
+  repeated fixed32 rufint = 29;
+  map<fixed32,fixed32> mufint = 30;
+  uint64 ulong = 31;
+  repeated uint64 rulong = 32;
+  map<uint64,uint64> mulong = 33;
+  fixed64 uflong = 34;
+  repeated fixed64 ruflong = 35;
+  map<fixed64,fixed64> muflong = 36;
+  string str = 37;
+  repeated string rstr = 38;
+  map<string,string> mstr = 39;
+  bytes bin = 40;
+  repeated bytes rbin = 41;
+  map<int32,bytes> mbin = 42;
+  enum EnumX {
+    A = 0;
+    B = 1;
+    C = 2;
+  }
+  EnumX enm = 43;
+  repeated EnumX renm = 44;
+  map<int32,EnumX> menm = 45;
+  Value nst = 46;
+  repeated Value rnst = 47;
+  map<int32,Value> mnst = 48;
+}

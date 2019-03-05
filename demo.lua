@@ -1,3 +1,5 @@
+local protobuf = require('protobuf')
+
 local function dump(t, i)
   if not i then
     i = 0
@@ -15,12 +17,11 @@ local function dump(t, i)
   end
 end
 
-local protobuf = require('protobuf')
-local input = {items = {[2] = 4}, nested = {text = 'hello!', some = {1, 2, 3}}, istrue = false}
+local input = {items = {[2] = 4.5}, nested = {text = 'hello!', some = {1, 2, 3}}, istrue = false}
 local binary = protobuf.encode('demo.Base', input)
 local output = protobuf.decode('demo.Base', binary)
 
-print('ENCODE')
+print('INPUT')
 dump(input)
-print('\nDECODE')
+print('OUTPUT')
 dump(output)

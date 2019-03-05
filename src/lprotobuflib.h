@@ -7,10 +7,10 @@
 #define LUAOPEN_PROTOBUF_(name) int luaopen_protobuf##name(lua_State *L)
 #define LUAOPEN_PROTOBUF(name) LUAOPEN_PROTOBUF_(name)
 
-#ifndef LUA_PROTOBUF_NAME
-#define LUA_PROTOBUF_NAME
+#ifndef SUFFIX
+#define SUFFIX
 #endif
 
-extern "C" LUAOPEN_PROTOBUF(LUA_PROTOBUF_NAME);
+extern "C" LUAOPEN_PROTOBUF(SUFFIX);
 
 #endif

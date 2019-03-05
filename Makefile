@@ -5,7 +5,7 @@ LDLIBS := $(shell pkg-config lua --libs)
 LDLIBS += -lprotobuf -lpthread
 
 LUA_VERSION	:= $(shell lua -e "_,_,v=string.find(_VERSION,'Lua (.+)');print(v)")
-ifeq ($(LUA_VERSION),)
+ifndef LUA_VERSION
   LUA_VERSION := 5.3
 endif
 LUA_LIBDIR := /usr/lib/lua/$(LUA_VERSION)
@@ -16,11 +16,15 @@ PBSOURCES := $(patsubst $(LUA_PROTOBUF_PATH)/%.proto, src/%.pb.cc, $(PROTOS))
 SOURCES := $(filter-out $(wildcard src/*.pb.cc), $(wildcard src/*.cc))
 OBJECTS := $(patsubst %.cc, %.o, $(SOURCES) $(PBSOURCES))
 
-ifneq ($(LUA_PROTOBUF_NAME),)
-  CFLAGS += -DLUA_PROTOBUF_NAME=_$(LUA_PROTOBUF_NAME)
-  OUTFILE := protobuf_$(LUA_PROTOBUF_NAME).so
+ifdef LUA_PROTOBUF_SUFFIX
+  CFLAGS += -DSUFFIX=_$(LUA_PROTOBUF_SUFFIX)
+  OUTFILE := protobuf_$(LUA_PROTOBUF_SUFFIX).so
 else
   OUTFILE := protobuf.so
+endif
+
+ifdef LUA_PROTOBUF_ENUM_AS_NUMBER
+  CFLAGS += -DENUM_AS_NUMBER
 endif
 
 $(OUTFILE): $(OBJECTS)

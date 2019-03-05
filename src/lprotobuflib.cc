@@ -51,7 +51,49 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
     {
       switch (field->type())
       {
+        case FieldDescriptor::TYPE_DOUBLE:
+          if (field->is_repeated())
+          {
+            luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
+            int len = luaL_len(L, -1);
+
+            for (int n = 1; n <= len; n++)
+            {
+              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TNUMBER, field->number(), "not a number");
+              reflection->AddDouble(message, field, lua_tonumber(L, -1));
+              lua_pop(L, 1);
+            }
+          }
+          else
+          {
+            luaL_argcheck(L, type == LUA_TNUMBER, field->number(), "not a number");
+            reflection->SetDouble(message, field, lua_tonumber(L, -1));
+          }
+          break;
+
+        case FieldDescriptor::TYPE_FLOAT:
+          if (field->is_repeated())
+          {
+            luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
+            int len = luaL_len(L, -1);
+
+            for (int n = 1; n <= len; n++)
+            {
+              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TNUMBER, field->number(), "not a number");
+              reflection->AddFloat(message, field, lua_tonumber(L, -1));
+              lua_pop(L, 1);
+            }
+          }
+          else
+          {
+            luaL_argcheck(L, type == LUA_TNUMBER, field->number(), "not a number");
+            reflection->SetFloat(message, field, lua_tonumber(L, -1));
+          }
+          break;
+
         case FieldDescriptor::TYPE_INT32:
+        case FieldDescriptor::TYPE_SINT32:
+        case FieldDescriptor::TYPE_SFIXED32:
           if (field->is_repeated())
           {
             luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
@@ -71,7 +113,30 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
           }
           break;
 
+        case FieldDescriptor::TYPE_INT64:
+        case FieldDescriptor::TYPE_SINT64:
+        case FieldDescriptor::TYPE_SFIXED64:
+          if (field->is_repeated())
+          {
+            luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
+            int len = luaL_len(L, -1);
+
+            for (int n = 1; n <= len; n++)
+            {
+              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TNUMBER, field->number(), "not an integer");
+              reflection->AddInt64(message, field, lua_tointeger(L, -1));
+              lua_pop(L, 1);
+            }
+          }
+          else
+          {
+            luaL_argcheck(L, type == LUA_TNUMBER, field->number(), "not an integer");
+            reflection->SetInt64(message, field, lua_tointeger(L, -1));
+          }
+          break;
+
         case FieldDescriptor::TYPE_UINT32:
+        case FieldDescriptor::TYPE_FIXED32:
           if (field->is_repeated())
           {
             luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
@@ -91,7 +156,8 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
           }
           break;
 
-        case FieldDescriptor::TYPE_FLOAT:
+        case FieldDescriptor::TYPE_UINT64:
+        case FieldDescriptor::TYPE_FIXED64:
           if (field->is_repeated())
           {
             luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
@@ -99,35 +165,15 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
 
             for (int n = 1; n <= len; n++)
             {
-              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TNUMBER, field->number(), "not a float");
-              reflection->AddFloat(message, field, lua_tonumber(L, -1));
+              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TNUMBER, field->number(), "not an integer");
+              reflection->AddUInt64(message, field, lua_tointeger(L, -1));
               lua_pop(L, 1);
             }
           }
           else
           {
-            luaL_argcheck(L, type == LUA_TNUMBER, field->number(), "not a float");
-            reflection->SetFloat(message, field, lua_tonumber(L, -1));
-          }
-          break;
-
-        case FieldDescriptor::TYPE_STRING:
-          if (field->is_repeated())
-          {
-            luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
-            int len = luaL_len(L, -1);
-
-            for (int n = 1; n <= len; n++)
-            {
-              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TSTRING, field->number(), "not a string");
-              reflection->AddString(message, field, std::string(lua_tostring(L, -1)));
-              lua_pop(L, 1);
-            }
-          }
-          else
-          {
-            luaL_argcheck(L, type == LUA_TSTRING, field->number(), "not a string");
-            reflection->SetString(message, field, std::string(lua_tostring(L, -1)));
+            luaL_argcheck(L, type == LUA_TNUMBER, field->number(), "not an integer");
+            reflection->SetUInt64(message, field, lua_tointeger(L, -1));
           }
           break;
 
@@ -151,6 +197,65 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
           }
           break;
 
+        case FieldDescriptor::TYPE_STRING:
+        case FieldDescriptor::TYPE_BYTES:
+          if (field->is_repeated())
+          {
+            luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
+            int len = luaL_len(L, -1);
+
+            for (int n = 1; n <= len; n++)
+            {
+              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TSTRING, field->number(), "not a string");
+              reflection->AddString(message, field, std::string(lua_tostring(L, -1)));
+              lua_pop(L, 1);
+            }
+          }
+          else
+          {
+            luaL_argcheck(L, type == LUA_TSTRING, field->number(), "not a string");
+            reflection->SetString(message, field, std::string(lua_tostring(L, -1)));
+          }
+          break;
+
+        case FieldDescriptor::TYPE_ENUM:
+          if (field->is_repeated())
+          {
+            luaL_argcheck(L, type == LUA_TTABLE, field->number(), "not a table");
+            int len = luaL_len(L, -1);
+
+            for (int n = 1; n <= len; n++)
+            {
+#ifdef ENUM_AS_NUMBER
+              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TNUMBER, field->number(), "not a number");
+              lua_Integer number = lua_tointeger(L, -1);
+              const EnumValueDescriptor *value = field->enum_type()->FindValueByNumber(number);
+#else
+              luaL_argcheck(L, lua_rawgeti(L, -1, n) == LUA_TSTRING, field->number(), "not a string");
+              const char *name = lua_tostring(L, -1);
+              const EnumValueDescriptor *value = field->enum_type()->FindValueByName(name);
+#endif
+              luaL_argcheck(L, value != NULL, field->number(), "unknown enum");
+              reflection->AddEnum(message, field, value);
+              lua_pop(L, 1);
+            }
+          }
+          else
+          {
+#ifdef ENUM_AS_NUMBER
+            luaL_argcheck(L, type == LUA_TNUMBER, field->number(), "not a number");
+            lua_Integer number = lua_tointeger(L, -1);
+            const EnumValueDescriptor *value = field->enum_type()->FindValueByNumber(number);
+#else
+            luaL_argcheck(L, type == LUA_TSTRING, field->number(), "not a string");
+            const char *name = lua_tostring(L, -1);
+            const EnumValueDescriptor *value = field->enum_type()->FindValueByName(name);
+#endif
+            luaL_argcheck(L, value != NULL, field->number(), "unknown enum");
+            reflection->SetEnum(message, field, value);
+          }
+          break;
+
         case FieldDescriptor::TYPE_MESSAGE:
           if (field->message_type()->options().map_entry())
           {
@@ -165,18 +270,34 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
               switch (KEY(field)->type())
               {
                 case FieldDescriptor::TYPE_INT32:
+                case FieldDescriptor::TYPE_SINT32:
+                case FieldDescriptor::TYPE_SFIXED32:
                   luaL_checktype(L, -2, LUA_TNUMBER);
                   entry->GetReflection()->SetInt32(entry, KEY(field), lua_tointeger(L, -2));
                   break;
 
+                case FieldDescriptor::TYPE_INT64:
+                case FieldDescriptor::TYPE_SINT64:
+                case FieldDescriptor::TYPE_SFIXED64:
+                  luaL_checktype(L, -2, LUA_TNUMBER);
+                  entry->GetReflection()->SetInt64(entry, KEY(field), lua_tointeger(L, -2));
+                  break;
+
                 case FieldDescriptor::TYPE_UINT32:
+                case FieldDescriptor::TYPE_FIXED32:
                   luaL_checktype(L, -2, LUA_TNUMBER);
                   entry->GetReflection()->SetUInt32(entry, KEY(field), lua_tointeger(L, -2));
                   break;
 
-                case FieldDescriptor::TYPE_FLOAT:
+                case FieldDescriptor::TYPE_UINT64:
+                case FieldDescriptor::TYPE_FIXED64:
                   luaL_checktype(L, -2, LUA_TNUMBER);
-                  entry->GetReflection()->SetFloat(entry, KEY(field), lua_tonumber(L, -2));
+                  entry->GetReflection()->SetUInt64(entry, KEY(field), lua_tointeger(L, -2));
+                  break;
+
+                case FieldDescriptor::TYPE_BOOL:
+                  luaL_checktype(L, -2, LUA_TBOOLEAN);
+                  entry->GetReflection()->SetBool(entry, KEY(field), lua_toboolean(L, -2));
                   break;
 
                 case FieldDescriptor::TYPE_STRING:
@@ -185,19 +306,14 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
                   break;
 
                 default:
-                  luaL_error(L, "unsupported KEY(%i)", KEY(field)->type());
+                  luaL_error(L, "unsupported key: %s", KEY(field)->type_name());
               }
 
               switch (VALUE(field)->type())
               {
-                case FieldDescriptor::TYPE_INT32:
+                case FieldDescriptor::TYPE_DOUBLE:
                   luaL_checktype(L, -1, LUA_TNUMBER);
-                  entry->GetReflection()->SetInt32(entry, VALUE(field), lua_tointeger(L, -1));
-                  break;
-
-                case FieldDescriptor::TYPE_UINT32:
-                  luaL_checktype(L, -1, LUA_TNUMBER);
-                  entry->GetReflection()->SetUInt32(entry, VALUE(field), lua_tointeger(L, -1));
+                  entry->GetReflection()->SetDouble(entry, VALUE(field), lua_tonumber(L, -1));
                   break;
 
                 case FieldDescriptor::TYPE_FLOAT:
@@ -205,9 +321,30 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
                   entry->GetReflection()->SetFloat(entry, VALUE(field), lua_tonumber(L, -1));
                   break;
 
-                case FieldDescriptor::TYPE_STRING:
-                  luaL_checktype(L, -1, LUA_TSTRING);
-                  entry->GetReflection()->SetString(entry, VALUE(field), std::string(lua_tostring(L, -1)));
+                case FieldDescriptor::TYPE_INT32:
+                case FieldDescriptor::TYPE_SINT32:
+                case FieldDescriptor::TYPE_SFIXED32:
+                  luaL_checktype(L, -1, LUA_TNUMBER);
+                  entry->GetReflection()->SetInt32(entry, VALUE(field), lua_tointeger(L, -1));
+                  break;
+
+                case FieldDescriptor::TYPE_INT64:
+                case FieldDescriptor::TYPE_SINT64:
+                case FieldDescriptor::TYPE_SFIXED64:
+                  luaL_checktype(L, -1, LUA_TNUMBER);
+                  entry->GetReflection()->SetInt64(entry, VALUE(field), lua_tointeger(L, -1));
+                  break;
+
+                case FieldDescriptor::TYPE_UINT32:
+                case FieldDescriptor::TYPE_FIXED32:
+                  luaL_checktype(L, -1, LUA_TNUMBER);
+                  entry->GetReflection()->SetUInt32(entry, VALUE(field), lua_tointeger(L, -1));
+                  break;
+
+                case FieldDescriptor::TYPE_UINT64:
+                case FieldDescriptor::TYPE_FIXED64:
+                  luaL_checktype(L, -1, LUA_TNUMBER);
+                  entry->GetReflection()->SetUInt64(entry, VALUE(field), lua_tointeger(L, -1));
                   break;
 
                 case FieldDescriptor::TYPE_BOOL:
@@ -215,12 +352,32 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
                   entry->GetReflection()->SetBool(entry, VALUE(field), lua_toboolean(L, -1));
                   break;
 
+                case FieldDescriptor::TYPE_STRING:
+                case FieldDescriptor::TYPE_BYTES:
+                  luaL_checktype(L, -1, LUA_TSTRING);
+                  entry->GetReflection()->SetString(entry, VALUE(field), std::string(lua_tostring(L, -1)));
+                  break;
+
+                case FieldDescriptor::TYPE_ENUM:
+                  {
+#ifdef ENUM_AS_NUMBER
+                    lua_Integer number = luaL_checkinteger(L, -1);
+                    const EnumValueDescriptor *value = VALUE(field)->enum_type()->FindValueByNumber(number);
+#else
+                    const char *name = luaL_checkstring(L, -1);
+                    const EnumValueDescriptor *value = VALUE(field)->enum_type()->FindValueByName(name);
+#endif
+                    luaL_argcheck(L, value != NULL, -1, "unknown enum");
+                    entry->GetReflection()->SetEnum(entry, VALUE(field), value);
+                  }
+                  break;
+
                 case FieldDescriptor::TYPE_MESSAGE:
                   protobuf_tomessage(L, lua_gettop(L), entry->GetReflection()->MutableMessage(entry, VALUE(field)));
                   break;
 
                 default:
-                  luaL_error(L, "unsupported VALUE(field)", VALUE(field)->type());
+                  luaL_error(L, "unsupported value: %s", VALUE(field)->type_name());
               }
 
               entries.Add(*entry);
@@ -250,7 +407,7 @@ static void protobuf_tomessage(lua_State *L, int index, Message* message)
           break;
 
         default:
-          luaL_error(L, "unsupported field %i", field->type());
+          luaL_error(L, "unsupported field: %s", field->type_name());
       }
     }
 
@@ -273,7 +430,7 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 
     switch (field->type())
     {
-      case FieldDescriptor::TYPE_INT32:
+      case FieldDescriptor::TYPE_DOUBLE:
         if (field->is_repeated())
         {
           int size = reflection->FieldSize(message, field);
@@ -281,31 +438,13 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 
           for (int index = 0; index < size; index++)
           {
-            lua_pushinteger(L, reflection->GetRepeatedInt32(message, field, index));
+            lua_pushnumber(L, reflection->GetRepeatedDouble(message, field, index));
             lua_rawseti(L, -2, index + 1);
           }
         }
         else
         {
-          lua_pushinteger(L, reflection->GetInt32(message, field));
-        }
-        break;
-
-      case FieldDescriptor::TYPE_UINT32:
-        if (field->is_repeated())
-        {
-          int size = reflection->FieldSize(message, field);
-          lua_createtable(L, 0, size);
-
-          for (int index = 0; index < size; index++)
-          {
-            lua_pushinteger(L, reflection->GetRepeatedUInt32(message, field, index));
-            lua_rawseti(L, -2, index + 1);
-          }
-        }
-        else
-        {
-          lua_pushinteger(L, reflection->GetUInt32(message, field));
+          lua_pushnumber(L, reflection->GetDouble(message, field));
         }
         break;
 
@@ -327,7 +466,9 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
         }
         break;
 
-      case FieldDescriptor::TYPE_STRING:
+      case FieldDescriptor::TYPE_INT32:
+      case FieldDescriptor::TYPE_SINT32:
+      case FieldDescriptor::TYPE_SFIXED32:
         if (field->is_repeated())
         {
           int size = reflection->FieldSize(message, field);
@@ -335,13 +476,71 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
 
           for (int index = 0; index < size; index++)
           {
-            lua_pushstring(L, reflection->GetRepeatedString(message, field, index).c_str());
+            lua_pushinteger(L, reflection->GetRepeatedInt32(message, field, index));
             lua_rawseti(L, -2, index + 1);
           }
         }
         else
         {
-          lua_pushstring(L, reflection->GetString(message, field).c_str());
+          lua_pushinteger(L, reflection->GetInt32(message, field));
+        }
+        break;
+
+      case FieldDescriptor::TYPE_INT64:
+      case FieldDescriptor::TYPE_SINT64:
+      case FieldDescriptor::TYPE_SFIXED64:
+        if (field->is_repeated())
+        {
+          int size = reflection->FieldSize(message, field);
+          lua_createtable(L, 0, size);
+
+          for (int index = 0; index < size; index++)
+          {
+            lua_pushinteger(L, reflection->GetRepeatedInt64(message, field, index));
+            lua_rawseti(L, -2, index + 1);
+          }
+        }
+        else
+        {
+          lua_pushinteger(L, reflection->GetInt64(message, field));
+        }
+        break;
+
+      case FieldDescriptor::TYPE_UINT32:
+      case FieldDescriptor::TYPE_FIXED32:
+        if (field->is_repeated())
+        {
+          int size = reflection->FieldSize(message, field);
+          lua_createtable(L, 0, size);
+
+          for (int index = 0; index < size; index++)
+          {
+            lua_pushinteger(L, reflection->GetRepeatedUInt32(message, field, index));
+            lua_rawseti(L, -2, index + 1);
+          }
+        }
+        else
+        {
+          lua_pushinteger(L, reflection->GetUInt32(message, field));
+        }
+        break;
+
+      case FieldDescriptor::TYPE_UINT64:
+      case FieldDescriptor::TYPE_FIXED64:
+        if (field->is_repeated())
+        {
+          int size = reflection->FieldSize(message, field);
+          lua_createtable(L, 0, size);
+
+          for (int index = 0; index < size; index++)
+          {
+            lua_pushinteger(L, reflection->GetRepeatedUInt64(message, field, index));
+            lua_rawseti(L, -2, index + 1);
+          }
+        }
+        else
+        {
+          lua_pushinteger(L, reflection->GetUInt64(message, field));
         }
         break;
 
@@ -363,6 +562,51 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
         }
         break;
 
+      case FieldDescriptor::TYPE_STRING:
+      case FieldDescriptor::TYPE_BYTES:
+        if (field->is_repeated())
+        {
+          int size = reflection->FieldSize(message, field);
+          lua_createtable(L, 0, size);
+
+          for (int index = 0; index < size; index++)
+          {
+            lua_pushstring(L, reflection->GetRepeatedString(message, field, index).c_str());
+            lua_rawseti(L, -2, index + 1);
+          }
+        }
+        else
+        {
+          lua_pushstring(L, reflection->GetString(message, field).c_str());
+        }
+        break;
+
+      case FieldDescriptor::TYPE_ENUM:
+        if (field->is_repeated())
+        {
+          int size = reflection->FieldSize(message, field);
+          lua_createtable(L, 0, size);
+
+          for (int index = 0; index < size; index++)
+          {
+#ifdef ENUM_AS_NUMBER
+            lua_pushinteger(L, reflection->GetRepeatedEnum(message, field, index)->number());
+#else
+            lua_pushstring(L, reflection->GetRepeatedEnum(message, field, index)->name().c_str());
+#endif
+            lua_rawseti(L, -2, index + 1);
+          }
+        }
+        else
+        {
+#ifdef ENUM_AS_NUMBER
+          lua_pushinteger(L, reflection->GetEnum(message, field)->number());
+#else
+          lua_pushstring(L, reflection->GetEnum(message, field)->name().c_str());
+#endif
+        }
+        break;
+
       case FieldDescriptor::TYPE_MESSAGE:
         if (field->message_type()->options().map_entry())
         {
@@ -376,15 +620,29 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
             switch (KEY(field)->type())
             {
               case FieldDescriptor::TYPE_INT32:
+              case FieldDescriptor::TYPE_SINT32:
+              case FieldDescriptor::TYPE_SFIXED32:
                 lua_pushinteger(L, entry.GetReflection()->GetInt32(entry, KEY(field)));
                 break;
 
+              case FieldDescriptor::TYPE_INT64:
+              case FieldDescriptor::TYPE_SINT64:
+              case FieldDescriptor::TYPE_SFIXED64:
+                lua_pushinteger(L, entry.GetReflection()->GetInt64(entry, KEY(field)));
+                break;
+
               case FieldDescriptor::TYPE_UINT32:
+              case FieldDescriptor::TYPE_FIXED32:
                 lua_pushinteger(L, entry.GetReflection()->GetUInt32(entry, KEY(field)));
                 break;
 
-              case FieldDescriptor::TYPE_FLOAT:
-                lua_pushnumber(L, entry.GetReflection()->GetFloat(entry, KEY(field)));
+              case FieldDescriptor::TYPE_UINT64:
+              case FieldDescriptor::TYPE_FIXED64:
+                lua_pushinteger(L, entry.GetReflection()->GetUInt64(entry, KEY(field)));
+                break;
+
+              case FieldDescriptor::TYPE_BOOL:
+                lua_pushboolean(L, entry.GetReflection()->GetBool(entry, KEY(field)));
                 break;
 
               case FieldDescriptor::TYPE_STRING:
@@ -392,29 +650,56 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
                 break;
 
               default:
-                luaL_error(L, "unsupported KEY(%i)", KEY(field)->type());
+                luaL_error(L, "unsupported key: %s", KEY(field)->type_name());
             }
 
             switch (VALUE(field)->type())
             {
-              case FieldDescriptor::TYPE_INT32:
-                lua_pushinteger(L, entry.GetReflection()->GetInt32(entry, VALUE(field)));
-                break;
-
-              case FieldDescriptor::TYPE_UINT32:
-                lua_pushinteger(L, entry.GetReflection()->GetUInt32(entry, VALUE(field)));
+              case FieldDescriptor::TYPE_DOUBLE:
+                lua_pushnumber(L, entry.GetReflection()->GetDouble(entry, VALUE(field)));
                 break;
 
               case FieldDescriptor::TYPE_FLOAT:
                 lua_pushnumber(L, entry.GetReflection()->GetFloat(entry, VALUE(field)));
                 break;
 
-              case FieldDescriptor::TYPE_STRING:
-                lua_pushstring(L, entry.GetReflection()->GetString(entry, VALUE(field)).c_str());
+              case FieldDescriptor::TYPE_INT32:
+              case FieldDescriptor::TYPE_SINT32:
+              case FieldDescriptor::TYPE_SFIXED32:
+                lua_pushinteger(L, entry.GetReflection()->GetInt32(entry, VALUE(field)));
+                break;
+
+              case FieldDescriptor::TYPE_INT64:
+              case FieldDescriptor::TYPE_SINT64:
+              case FieldDescriptor::TYPE_SFIXED64:
+                lua_pushinteger(L, entry.GetReflection()->GetInt64(entry, VALUE(field)));
+                break;
+
+              case FieldDescriptor::TYPE_UINT32:
+              case FieldDescriptor::TYPE_FIXED32:
+                lua_pushinteger(L, entry.GetReflection()->GetUInt32(entry, VALUE(field)));
+                break;
+
+              case FieldDescriptor::TYPE_UINT64:
+              case FieldDescriptor::TYPE_FIXED64:
+                lua_pushinteger(L, entry.GetReflection()->GetUInt64(entry, VALUE(field)));
                 break;
 
               case FieldDescriptor::TYPE_BOOL:
                 lua_pushboolean(L, entry.GetReflection()->GetBool(entry, VALUE(field)));
+                break;
+
+              case FieldDescriptor::TYPE_STRING:
+              case FieldDescriptor::TYPE_BYTES:
+                lua_pushstring(L, entry.GetReflection()->GetString(entry, VALUE(field)).c_str());
+                break;
+
+              case FieldDescriptor::TYPE_ENUM:
+#ifdef ENUM_AS_NUMBER
+                lua_pushinteger(L, entry.GetReflection()->GetEnum(entry, VALUE(field))->number());
+#else
+                lua_pushstring(L, entry.GetReflection()->GetEnum(entry, VALUE(field))->name().c_str());
+#endif
                 break;
 
               case FieldDescriptor::TYPE_MESSAGE:
@@ -422,7 +707,7 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
                 break;
 
               default:
-                luaL_error(L, "unsupported VALUE(%i)", VALUE(field)->type());
+                luaL_error(L, "unsupported value: %s", VALUE(field)->type_name());
             }
 
             lua_rawset(L, -3);
@@ -451,7 +736,7 @@ static void protobuf_pushmessage(lua_State *L, const Message& message)
         break;
 
       default:
-        luaL_error(L, "unsupported field %i", field->type());
+        luaL_error(L, "unsupported field: %s", field->type_name());
     }
 
     lua_rawset(L, -3);
@@ -486,7 +771,7 @@ static const struct luaL_Reg protobuf_f [] = {
   {NULL, NULL}
 };
 
-LUAOPEN_PROTOBUF(LUA_PROTOBUF_NAME)
+LUAOPEN_PROTOBUF(SUFFIX)
 {
   luaL_newlib(L, protobuf_f);
   return 1;
