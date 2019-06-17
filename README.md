@@ -47,5 +47,5 @@ LUA_PROTOBUF_ENUM_AS_NUMBER=1 make
 ## Demo
 You need to have made lua-protobuf without providing any LUA\_PROTOBUF\_\* variable.
 ```
-lua -v demo.lua
+lua demo.lua
 ```
